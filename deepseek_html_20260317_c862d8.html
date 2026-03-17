@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMUS 2026 - Visualizador de Ponentes</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header {
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+        .filter-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #dee2e6;
+        }
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #dee2e6;
+        }
+        .table thead th {
+            background-color: #e9ecef;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+        .badge-room {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.35em 0.65em;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-day {
+            background-color: #0d6efd;
+            color: white;
+            padding: 0.35em 0.65em;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-time {
+            background-color: #198754;
+            color: white;
+            padding: 0.35em 0.65em;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            color: #6c757d;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+        }
+        .search-box input {
+            padding-left: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+        <h1><i class="fas fa-users me-2"></i>COMUS 2026 - Directorio de Ponentes</h1>
+        <p>Encuentra a todos los participantes por nombre, día, sala y horario</p>
+        <p class="mt-2 small"><i class="fas fa-info-circle me-1"></i> Las ponencias están disponibles todo el día desde las 9:00 (hora Madrid). Los directos son a las 18:00.</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filtros -->
+    <div class="filter-card">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label for="searchName" class="form-label fw-bold"><i class="fas fa-search me-1"></i>Buscar por nombre</label>
+                <div class="search-box">
+                    <i class="fas fa-user"></i>
+                    <input type="text" class="form-control" id="searchName" placeholder="Ej: Silvia Casorrán">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="filterDay" class="form-label fw-bold"><i class="fas fa-calendar-day me-1"></i>Día</label>
+                <select class="form-select" id="filterDay">
+                    <option value="all">Todos los días</option>
+                    <option value="16/03">16/03</option>
+                    <option value="17/03">17/03</option>
+                    <option value="18/03">18/03</option>
+                    <option value="19/03">19/03</option>
+                    <option value="20/03">20/03</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterRoom" class="form-label fw-bold"><i class="fas fa-door-open me-1"></i>Sala</label>
+                <select class="form-select" id="filterRoom">
+                    <option value="all">Todas las salas</option>
+                    <option value="SALA 1">SALA 1: Urbanismo, Movilidad y Medio Ambiente</option>
+                    <option value="SALA 2">SALA 2: Movilidad Personal</option>
+                    <option value="SALA 3">SALA 3: Transporte Público</option>
+                    <option value="SALA 4">SALA 4: Intermodalidad e Integración</option>
+                    <option value="SALA 5">SALA 5: Economía del Transporte</option>
+                    <option value="SALA 6">SALA 6: Gestión y Operación</option>
+                    <option value="SALA 7">SALA 7: Ferrocarril y Mercancías</option>
+                    <option value="SALA 8">SALA 8: Debates de Actualidad</option>
+                    <option value="SALA 9">SALA 9: Tecnología e Innovación</option>
+                    <option value="SALA 10">SALA 10: Coche, Estacionamiento y Buenas Prácticas</option>
+                    <option value="Directo">Directos YouTube</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-outline-secondary w-100" id="resetFilters" title="Limpiar filtros">
+                    <i class="fas fa-undo"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Listado de ponentes</h5>
+            <span class="badge bg-secondary" id="resultCount">0</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Título / Ponencia</th>
+                        <th>Día</th>
+                        <th>Sala</th>
+                        <th>Horario</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Se llenará con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <div id="noResults" class="text-center py-5 text-muted d-none">
+            <i class="fas fa-user-slash fa-3x mb-3"></i>
+            <p>No se encontraron ponentes con los filtros seleccionados.</p>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p class="mb-0"><i class="far fa-calendar-alt me-1"></i> COMUS 2026 - 16 al 20 de marzo | Datos extraídos del programa oficial</p>
+        <p class="small mt-2 text-muted">Claude puede cometer errores. Verifica la información en la web oficial.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // --------------------------------------------------------------
+    // DATOS DE LOS PONENTES (extraídos manualmente del programa)
+    // --------------------------------------------------------------
+    const speakers = [];
+
+    // Función auxiliar para añadir ponentes de forma cómoda
+    function addSpeaker(name, affiliation, title, day, room, time = 'Todo el día', type = 'ponencia') {
+        speakers.push({
+            name: name,
+            affiliation: affiliation || '',
+            title: title,
+            day: day,
+            room: room,
+            time: time,
+            type: type
+        });
+    }
+
+    // ========== DIRECTOS DIARIOS ==========
+    // Día 1 (16/03)
+    addSpeaker('Julián Sastre', 'Presidente del Instituto de Movilidad', 'INAUGURACIÓN DE COMUS 2026', '16/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('David Álvarez', 'Vicepresidente del Instituto de Movilidad', 'INAUGURACIÓN DE COMUS 2026', '16/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Sara Hernández del Olmo', 'Secretaria General de Movilidad Sostenible (Ministerio de Transportes)', 'INAUGURACIÓN DE COMUS 2026', '16/03', 'Directo YouTube', '18:00', 'directo');
+
+    // Día 2 (17/03)
+    addSpeaker('Dionisio González', 'Director de América Latina UITP', 'INNOVACIONES Y TRANSPORTE PÚBLICO', '17/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Martha Gutiérrez', 'Secretaria General de la Red Simus', 'INNOVACIONES Y TRANSPORTE PÚBLICO', '17/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Rafael Barbadillo', 'Presidente de CONFEBUS', 'INNOVACIONES Y TRANSPORTE PÚBLICO', '17/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Alberto Cillero', 'Director de Estudios, Licitaciones e Innovación en ALSA', 'INNOVACIONES Y TRANSPORTE PÚBLICO', '17/03', 'Directo YouTube', '18:00', 'directo');
+
+    // Día 3 (18/03)
+    addSpeaker('Silvia Casorrán', 'Secretaria General de Red de Ciudades por la Bicicleta', 'ELECTROMOVILIDAD', '18/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Gustavo Jiménez', 'CEO de e-Mobilitas', 'ELECTROMOVILIDAD', '18/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Javier Izquierdo', 'Director técnico de AEDIVE', 'ELECTROMOVILIDAD', '18/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Gorka Pradas', 'Director ejecutivo de CLIME', 'ELECTROMOVILIDAD', '18/03', 'Directo YouTube', '18:00', 'directo');
+
+    // Día 4 (19/03)
+    addSpeaker('Álvaro Fernández Heredia', 'Presidente de Renfe', 'FERROCARRILES Y MERCANCÍAS', '19/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Iñaki Barrón de Angoiti', 'Ex director de viajeros de la UIC', 'FERROCARRILES Y MERCANCÍAS', '19/03', 'Directo YouTube', '18:00', 'directo');
+
+    // Día 5 (20/03)
+    addSpeaker('Julián Sastre', 'Presidente del Instituto de Movilidad', 'CLAUSURA', '20/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('David Álvarez', 'Vicepresidente del Instituto de Movilidad', 'CLAUSURA', '20/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Rocío Moreno', 'Coordinadora del Instituto de Movilidad', 'CLAUSURA', '20/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Luis Blanco', 'Director de Operaciones de Telpark', 'CLAUSURA', '20/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Lola Ortiz', 'Directora General de Planificación e Infraestructuras de movilidad', 'CLAUSURA', '20/03', 'Directo YouTube', '18:00', 'directo');
+    addSpeaker('Antonio Álvarez Caamaño', 'Director de Ingeniería de ALSA', 'CLAUSURA', '20/03', 'Directo YouTube', '18:00', 'directo');
+
+    // ========== SALA 1 (16/03) ==========
+    const sala1 = 'SALA 1: Urbanismo, Movilidad y Medio Ambiente';
+    addSpeaker('Silvia Casorrán', 'Secretaria General de Red de Ciudades por la Bicicleta', 'Imaginarios de la movilidad sostenible - La batalla invisible por la movilidad activa', '16/03', sala1);
+    addSpeaker('Jaime Novo', 'Director de Comunicación de la Revista Ciclosfera', 'Imaginarios de la movilidad sostenible - La batalla invisible por la movilidad activa', '16/03', sala1);
+    addSpeaker('Carlos Rodríguez', 'Coordinador Internacional de 30 Días en Bici', 'Imaginarios de la movilidad sostenible - La batalla invisible por la movilidad activa', '16/03', sala1);
+    addSpeaker('Manuel Calvo', 'Director técnico. EstudioMC', 'Imaginarios de la movilidad sostenible - La batalla invisible por la movilidad activa', '16/03', sala1);
+    addSpeaker('Belén Calahorro Lizondo', 'Vicepresidenta ConBici. Coordinadora de Eurovelo España', 'Eurovelo estándar de calidad en cicloturismo y desplazamiento cotidiano', '16/03', sala1);
+    addSpeaker('Javier Cantarella', 'Director de Ingeniería y Economía del Transporte – Alomon', 'La bicicleta en Latinoamérica. Recomendaciones para implementar políticas ciclistas', '16/03', sala1);
+    addSpeaker('Manuel Calvo Salazar', 'Director técnico de EstudioMC', 'Urbanismo táctico: la virtud está en los detalles', '16/03', sala1);
+    addSpeaker('Ana Montalbán Navas', 'Directora Técnica de Red de Ciudades que Caminan', 'Aproximaciones semánticas al nuevo lenguaje de las ciudades', '16/03', sala1);
+    addSpeaker('Silvia Casorrán Martos', 'Secretaria General de Red de Ciudades por la Bicicleta', 'La bici no es de derechas ni de izquierdas. Buenas prácticas de RedBici', '16/03', sala1);
+    addSpeaker('Kyle Wagenschutz', 'Profesional de la planificación urbana y acelerador de cambios. CityThread', 'Build Faster. Build Together', '16/03', sala1);
+    addSpeaker('Lynn Scholl', 'Lead Transport Specialist - BID', 'Transporte escolar en Bahamas', '16/03', sala1);
+    addSpeaker('Javier Iturrino Guerrero', 'Profesor Asociado del Departamento de Geografía - Universitat de València', 'Más allá del carril-bici: priorizando las políticas públicas que transforman la cultura ciclista urbana. Un análisis con Best-Worst Scaling', '16/03', sala1);
+    addSpeaker('Lorena Romero Fontecha', 'Directora de la Fundación BiciActiva', 'Incidencia participativa en la toma de decisiones alrededor de la bicicleta en las ciudades', '16/03', sala1);
+    addSpeaker('Itziar Navarro', 'Fundadora y CEO de URBANISIM', 'Ciudades que invitan a caminar: 7 claves para transformar el espacio urbano', '16/03', sala1);
+    addSpeaker('Arantxa Hernández Colorado', 'Gerente de Vías Verdes. Fundación Ferrocarriles Españoles', 'Programa español de Vías Verdes', '16/03', sala1);
+    addSpeaker('Pedro Calaza Martínez', 'Director de Planificación e Ingeniería del Territorio (PIT)', 'Infraestructura verde, movilidad y salud', '16/03', sala1);
+    addSpeaker('Itsi Alveano Aguerrebere', 'Profesora del programa doctorado de ciudades inteligentes - Earth and life University (Cancún, México)', 'Movilidad activa de niñas y niños', '16/03', sala1);
+
+    // ========== SALA 2 (16/03) ==========
+    const sala2 = 'SALA 2: Movilidad Personal';
+    addSpeaker('Jaime Sierra Muñoz', 'Doctorando en Planificación, Diseño y Políticas Urbanas - Politécnico di Milano', '¿Qué se aprende viajando lento?', '16/03', sala2);
+    addSpeaker('María Cuello León', 'Directora del Área de Movilidad Sostenible y Accesibilidad en Consultora Alomon', 'Cómo hacer un buen Plan de Movilidad Sostenible al Trabajo', '16/03', sala2);
+    addSpeaker('Andrea Magnani', 'Directora provincial de movilidad sustentable - Ministerio de ambiente y cambio climático de la provincia de Santa Fe. Argentina', 'Caminos Escolares en Santa Fe. Argentina', '16/03', sala2);
+    addSpeaker('Marta Seoane Dios', 'Responsable del Área Técnica en Fundación Conama', 'El atasco como síntoma: Movilidad, urbanismo y derecho a la ciudad', '16/03', sala2);
+    addSpeaker('Susana Beatriz Alarcón de Cubías', 'Directora de Desarrollo Territorial en la Alcaldía Municipal de la Libertad Sur de El Salvador', 'Reconstruyendo la memoria de Santa Tecla: de espacios invadidos a una ciudad caminable', '16/03', sala2);
+    addSpeaker('Aldo González Barrera', 'Secretario General de la Liga Peatonal - México', 'La ciudad a tus pies', '16/03', sala2);
+    addSpeaker('María Cristina Gálvez', 'Investigadora en la Universidad Pablo Olavide- Sevilla', 'El patinete eléctrico: usos, potenciales y desafíos para la movilidad urbana', '16/03', sala2);
+    addSpeaker('Dylan Power', 'Investigador sénior - Urban Cycling Institute', 'Desarrollo de una política de movilidad activa en el Caribe: un estudio de caso de la isla caribeña neerlandesa de Bonaire', '16/03', sala2);
+    addSpeaker('Marina Gentil Muñoz', 'Investigadora - Urban Cycling Institute', 'De la observación a la acción: Fortalecimiento de la capacidad para el ciclismo urbano a través de visitas de estudio', '16/03', sala2);
+    addSpeaker('Viviana Chávez Ceja', 'Arquitecta con enfoque en planeación urbana y movilidad sostenible', 'Proyecto Senderos Seguros', '16/03', sala2);
+    addSpeaker('Julián Sastre', 'Presidente del Instituto de Movilidad', 'Movilidad Sostenible: El caso de Aracena (Huelva)', '16/03', sala2);
+    addSpeaker('Carlos Domínguez Delgado', 'Consultor en Alomon', 'Movilidad Sostenible: El caso de Aracena (Huelva)', '16/03', sala2);
+
+    // ========== SALA 3 (17/03) ==========
+    const sala3 = 'SALA 3: Transporte Público';
+    addSpeaker('Luis Alberto Martell Agusti', 'Presidente de Grupo EnVía Perú', 'El Transporte Urbano en la Megalopolis de Lima y Callao', '17/03', sala3);
+    addSpeaker('Carolina Martínez', 'Gerente General. Operadora Distrital de Transporte – La Rolita', 'Política empresarial de reclutamiento, formación y permanencia de mujeres en la cadena de la movilidad eléctrica', '17/03', sala3);
+    addSpeaker('Nicolás Rosales Pallarés', 'Presidente de Asociación Mexicana de Transporte y Movilidad (AMTM)', 'Cambiando la cara del Transporte en México', '17/03', sala3);
+    addSpeaker('Fady Awad Núñez', 'Director de Proyectos en Consultora ALOMON', 'Simulación de la movilidad en el área metropolitana de Sevilla', '17/03', sala3);
+    addSpeaker('Manuel Alejandro Moreno Cano', 'Presidente de Sevilla Quiere Metro', 'Alegaciones tramo sur línea 3 metro de Sevilla', '17/03', sala3);
+    addSpeaker('María Fernández Pérez', 'Directora General de Transportes de la Consejería de Obras Públicas, Vivienda y Movilidad', 'Entrevista a María Fernández Pérez', '17/03', sala3);
+    addSpeaker('Miguel Álvarez Martínez', 'Director del servicio de movilidad en el Ayuntamiento de Rivas-Vaciamadrid', 'En Bus al cole', '17/03', sala3);
+    addSpeaker('Carlos Acha Ledesma', 'Director de Tecnología e Innovación en EMT Madrid', 'Movilidad inteligente: experiencias y aprendizajes en el uso de IA en transporte público', '17/03', sala3);
+    addSpeaker('Gemma Solé Massó', 'Técnica del área de movilidad y Responsable de proyectos en Institut Metròpoli', 'La Encuesta de movilidad en día laborable (EMEF): metodología, uso y resultados principales', '17/03', sala3);
+    addSpeaker('Rosa Romero de la Osa', 'Responsable de Autoprotección y Seguridad de Metro de Sevilla', 'Plan de Autoprotección Metro de Sevilla', '17/03', sala3);
+    addSpeaker('Cristina Krumrain Ramos', 'Responsable de Talento, Diversidad y Relaciones Laborales de Metro de Sevilla', 'Diversidad e Inclusión en Metro de Sevilla', '17/03', sala3);
+    addSpeaker('Noelia Bautista', 'Directora de Operaciones de Metro de Sevilla', 'La movilidad en eventos de gran afluencia. Servicios especiales', '17/03', sala3);
+
+    // ========== SALA 4 (17/03) ==========
+    const sala4 = 'SALA 4: Intermodalidad e Integración del Transporte';
+    addSpeaker('Carlos Cristóbal-Pinto', 'Consultor experto en Transporte Público y Movilidad Sostenible', 'El IBERbarómetro de movilidad sostenible de ciudades UCCI-UITP', '17/03', sala4);
+    addSpeaker('Joaquín Botella-Malagón', 'Chief Technical Engineer - Railways en SENER', 'Conectividad multimodal e integración de servicios', '17/03', sala4);
+    addSpeaker('Julián Sastre', 'Presidente del Instituto de Movilidad', 'Estrategia de la Electromovilidad en las ciudades sostenibles', '17/03', sala4);
+    addSpeaker('Rainer Uphoff', 'CEO de MUFMI', 'La doble pobreza de Transporte_Intermodalidad sistémica-troncal, metropolitano, rural y de PMRs', '17/03', sala4);
+    addSpeaker('Paula Fraile Díaz', 'Directora de Proyectos en Movilidad Sostenible y Género en Consultora Alomon', 'Beneficios del cicloturismo para personas silver. Proyecto IberLobo', '17/03', sala4);
+    addSpeaker('Adrián Muelas Gil', 'Subdirector general de coordinación e iniciativas contra la despoblación (MITERD)', 'Movilidad rural, un sector con futuro', '17/03', sala4);
+    addSpeaker('Belén Cardasz', 'Responsable de desarrollo de negocio en Serveo. Bikesharing', 'Uso de datos y tecnologías emergentes en la gestión de la bicicleta pública', '17/03', sala4);
+    addSpeaker('Fernando Minaya Rodríguez', 'Experto en Movilidad y Seguridad Vial y Accesibilidad. Colegio de Ingenieros Técnicos de Obras Públicas', 'Factor humano en relación con los elementos de la infraestructura y coche autónomo', '17/03', sala4);
+    addSpeaker('Álvaro Basterra Miret', 'Director Comercial. Celering', 'Transporte a la demanda como palanca de cohesión territorial y lucha contra la despoblación', '17/03', sala4);
+    addSpeaker('Jordi Carbonell', 'Director Comercial de Nemi Mobility', 'Transporte a la Demanda', '17/03', sala4);
+    addSpeaker('Antonio Vázquez Olmedo', 'Presidente de FEDINTRA', 'Entrevista al Presidente de FEDINTRA', '17/03', sala4);
+
+    // ========== SALA 5 (18/03) ==========
+    const sala5 = 'SALA 5: Economía del Transporte';
+    addSpeaker('Andres Alcalá S.', 'Ejecutivo Principal /Especialista en Movilidad Urbana en CAF', 'Entrevista a Andrés Alcalá: CAF en América Latina', '18/03', sala5);
+    addSpeaker('Álvaro Benítez Fernández', 'Director de Transformación y Alianzas Estratégicas. Impulso by PONS', 'Monetizando el ahorro energético: Oportunidades del sistema CAE para el sector del transporte', '18/03', sala5);
+    addSpeaker('Luis Felipe Cárdenas Ávila', 'Consultor en Transporte y Logística - Experto en Economía del Transporte', 'Gestión de Costos de Transporte & Economía en la Intermodalidad', '18/03', sala5);
+    addSpeaker('Cristina Arjona Molina', 'Coordinadora campaña de movilidad de Greenpeace', 'El papel de la sociedad en la movilidad sostenible', '18/03', sala5);
+    addSpeaker('Juan Píriz Cayado', 'Consultor económico en consultora Alomon', 'Análisis Coste-Beneficio aplicado a las Zonas de Bajas Emisiones', '18/03', sala5);
+    addSpeaker('Nuria Pérez Sans', 'Responsable Área Movilidad del Institut Metròpoli', 'Desigualdad económica y movilidad sostenible', '18/03', sala5);
+    addSpeaker('Patxi Miranda', 'CEO de Kudea servicios', 'Movilidad Rural: Moverse para vivir. Acceso a servicios básicos en el medio rural', '18/03', sala5);
+    addSpeaker('José Antonio Villa Morales', 'Gerente de Estudios y Proyectos Viales en MVTO - Gestión en Movilidad', 'Impacto y aporte a la movilidad de los proyectos inmobiliarios, caso de Chile', '18/03', sala5);
+    addSpeaker('Margarita Amaya Torres', 'Directora de Gestión Corporativa en Conecta Logística', 'Logística Urbana', '18/03', sala5);
+    addSpeaker('Margarita Jiménez Corral', 'Profesora Asociada en la Universidad Politécnica de Madrid-Departamento de Transportes', 'Comparativa de Procesos de Licitación de Concesiones de transporte por carretera', '18/03', sala5);
+    addSpeaker('Andrea Magnani', 'Directora provincial de movilidad sustentable - Santa Fe, Argentina', 'Movilidad al Trabajo en Santa Fe. Argentina', '18/03', sala5);
+
+    // ========== SALA 6 (18/03) ==========
+    const sala6 = 'SALA 6: Gestión y Operación';
+    addSpeaker('Armando Martínez Alfaro', 'Director de Proyectos en S3 TRANSPORTATION BOLIVIA', 'Intervenciones Urbanas y Participación Ciudadana', '18/03', sala6);
+    addSpeaker('Juan de Dios Ortúzar', 'Profesor Emérito, experto en Movilidad Universidad Católica de Chile', 'Metodología de modelización para la evaluación del reparto modal en la bicicleta', '18/03', sala6);
+    addSpeaker('Samir Awad Núñez', 'Asesor de Grupo Municipal en el Ayuntamiento de Madrid', 'Movilidad Obsoleta', '18/03', sala6);
+    addSpeaker('Allison Phillips', 'Consultora de Movilidad Sostenible', 'Movilidad activa sin grandes obras: Estrategias simples para calles más seguras', '18/03', sala6);
+    addSpeaker('Irene Morán Harillo', 'Geógrafa / Directora de Proyectos en Consultora Alomon', 'Índice Potencial Ciclista: el uso del SIG para la toma de decisiones', '18/03', sala6);
+    addSpeaker('Ofelia Manjón-Cabeza Cruz', 'Directora General de Movilidad y Accesibilidad Universal en el Ayuntamiento de Santa Cruz de Tenerife', 'Retos en la transformación tecnológica de la gestión de la movilidad en ciudades pequeñas y medianas', '18/03', sala6);
+    addSpeaker('Salvador Herrera Montes', 'Director general. Experto consejero en Red Simus', 'Plan de movilidad y logística del Lago de Chapala. México', '18/03', sala6);
+    addSpeaker('Jaime Huerta', 'Secretario en ITS Spain', 'La Movilidad: problemas y soluciones', '18/03', sala6);
+    addSpeaker('Mario Muñoz-Atanet', 'Viceconsejero de Fomento, Infraestructuras y articulación del Territorio. Junta de Andalucía', 'Entrevista a Mario Muñoz-Atanet', '18/03', sala6);
+    addSpeaker('Javier Rivera Briones', 'Director de Sostenibilidad en Fundación Chilena de Eficiencia Logística - Conecta Logística', 'Experiencias Logísticas Sostenibles', '18/03', sala6);
+    addSpeaker('Carlos Bonnelly Ginebra', 'Coordinador Diplomado APP. Unicaribe', 'Estructuración de contratos de gestión y financiación privada de infraestructuras y servicios públicos de transporte', '18/03', sala6);
+    addSpeaker('David Álvarez Castillo', 'Vicepresidente del Instituto de Movilidad', 'Los municipios pequeños también merecen su plan de movilidad urbana sostenible', '18/03', sala6);
+
+    // ========== SALA 7 (19/03) ==========
+    const sala7 = 'SALA 7: Ferrocarril y Transporte de Mercancías';
+    addSpeaker('Adrián Fernández Carrasco', 'Director de Sostenibilidad de Renfe', 'Material rodante en el ferrocarril', '19/03', sala7);
+    addSpeaker('Alberto Matías García Álvarez', 'Profesor, Asesor, Consultor y Gerente de Área del Servicio de Estudios de Renfe', 'Diseño de sistemas ferroviarios', '19/03', sala7);
+    addSpeaker('Ángel Pulido Hernández', 'Director General de la Autoridad Portuaria de Sevilla', 'Plan Maestro del distrito portuario de Sevilla', '19/03', sala7);
+    addSpeaker('Eduardo Romo Urroz', 'Presidente de la Fundación Caminos de Hierro', 'Velocidad Óptima en el Sistema Ferroviario de altas prestaciones', '19/03', sala7);
+    addSpeaker('Federico Villalobos Carballo', 'Consultor en Infraestructura & APP', 'Sistemas ferroviarios de pasajeros en Costa Rica y Panamá: Cifras', '19/03', sala7);
+    addSpeaker('Ignacio Alvarez-Ossorio Ramos', 'Director de Puertos de Andalucía', 'Puertos y áreas logísticas autonómicas de Andalucía: retos y oportunidades', '19/03', sala7);
+    addSpeaker('José Manuel Almoguera Carvajal', 'Ingeniero consultor del Área Planificación del Transporte. SENER', 'El Tren Insurgentes Toluca-Ciudad de México: una apuesta por la sostenibilidad', '19/03', sala7);
+    addSpeaker('Javier Cortacans', 'Ingeniero y CEO de KMS Ingenieros y Arquitectos', 'El trazado ferroviario', '19/03', sala7);
+    addSpeaker('Constanza Delon Córdoba', 'Directora de Integración de Transporte de la Agencia Reguladora de Transporte Ferroviario de México.', 'Recuperación de trenes de pasajeros en México', '19/03', sala7);
+    addSpeaker('Montserrat Rallo del Olmo', 'Directora general de Planificación, Estrategia y Proyectos de ADIF', 'Proyectos de nuevas estaciones', '19/03', sala7);
+
+    // ========== SALA 8 (19/03) ==========
+    const sala8 = 'SALA 8: Debates de Actualidad';
+    addSpeaker('María Eugenia López Lambas', 'Profesora del Departamento de Ingeniería Civil. Transporte, Territorio y Urbanismo en la Universidad Politécnica de Madrid.', 'The walking health', '19/03', sala8);
+    addSpeaker('Noemí Vaquero Redondo', 'Vicepresidenta de WITAM', 'Impulsar y visibilizar el talento profesional de las mujeres', '19/03', sala8);
+    addSpeaker('Luciana Isidro Pereira', 'Coordinadora del Núcleo de Infraestructuras Estratégicas y Sistemas Regionales de TIS', 'Movilidad Turística', '19/03', sala8);
+    addSpeaker('Maite Peris Colom', 'Directora Corporativa de Comunicación y Relaciones Institucionales de Barcelona Activa', 'La comunicación en proyectos de transformación urbana', '19/03', sala8);
+    addSpeaker('María Jesús Molaguero Caballero', 'Jefa de departamento de Comercio y Marketing. Profesora de Transporte y Logística de IES CIFPD Ignacio Ellacuría', 'Movilidad Urbana Sostenible en los ciclos de Formación Profesional', '19/03', sala8);
+    addSpeaker('Miguel Morales González', 'Director técnico de Alomon Movilidad- Canarias', 'Túneles y Ciudad', '19/03', sala8);
+    addSpeaker('Tatiana Valencia Salazar', 'Directora de Proyectos en Constructora Amarilo', 'Bosques Urbanos: La ciudad que respira futuro', '19/03', sala8);
+    addSpeaker('Laura Valladares', 'Consultora. TIS.', 'Plan de Movilidad Empresarial', '19/03', sala8);
+    addSpeaker('Carmen Aycart Luengo', 'Coordinadora Asociación de Vías Verdes de Andalucía', 'La incidencia de la Red de Vías Verdes de Andalucía en la promoción del cicloturismo y la movilidad sostenible', '19/03', sala8);
+    addSpeaker('Verónica García Chiquero', 'Dirección MOVE IN', 'Impactos de la nueva Ley de Movilidad Sostenible', '19/03', sala8);
+    addSpeaker('Rocío Romo Torres', 'Arquitecta en ANETO Consultores', 'Aparcamientos públicos y edificios municipales como herramienta de movilidad urbana sostenible', '19/03', sala8);
+    addSpeaker('Javier Goikoetxea', 'CEO de Next Mobility Solutions', 'El impacto de la IA en la movilidad conectada', '19/03', sala8);
+    addSpeaker('Francisco José Rodríguez', 'Director de Estrategia Jurídica. Impulso by PONS', 'Zonas de Bajas Emisiones (ZBE): diseño, gobernanza público-privada y medición de impacto. ¿Por qué fracasan?', '19/03', sala8);
+    addSpeaker('Julien de Labaca', 'Asesor y explorador en movilidad', 'Turismo y Movilidad', '19/03', sala8);
+
+    // ========== SALA 9 (20/03) ==========
+    const sala9 = 'SALA 9: Tecnología e Innovación en el Transporte';
+    addSpeaker('Alfredo García Hernández-Díaz', 'Catedrático en la Universidad Pablo de Olavide y CSO en OGA', 'Agentes de IA para la optimización de rutas de vehículos', '20/03', sala9);
+    addSpeaker('José Antonio Ferreira Dapía', 'Socio Director de FERREIRA DAPÍA TECH CONSULTANT & EVENTS', 'Flotas Inteligentes y Movilidad del Futuro: Cómo los Datos Transforman el Transporte', '20/03', sala9);
+    addSpeaker('Luis Blanco Santiago', 'Director de operaciones de Telpark', 'Ecosistema de movilidad: desde la tecnología a la sostenibilidad', '20/03', sala9);
+    addSpeaker('José Ramón Fernández Silva', 'Director Territorial Sur On Street de Telpark', 'Ecosistema de movilidad: desde la tecnología a la sostenibilidad', '20/03', sala9);
+    addSpeaker('Amilcar Efrain Martinez Flores', 'Jefe de la Unidad de Movilidad Sostenible en OPAMSS', 'Innovación en la Planificación del Transporte Metropolitano: Plataforma MOVI', '20/03', sala9);
+    addSpeaker('Tania Gullón Muñoz-Repiso', 'Directora de la División de Estudios y Tecnología del Transporte en el Ministerio de Transportes', 'Los Datos en la movilidad - Entrevista a Tania Gullón', '20/03', sala9);
+    addSpeaker('Arturo Pérez de Lucía González', 'Director General de AEDIVE', 'Vehículo eléctrico y movilidad urbana', '20/03', sala9);
+    addSpeaker('Enrique Palma Villalón', 'Director gerente de TICMOVEO', 'El Vehículo Autónomo y la Tele-Conducción aplicados al problema de sostenibilidad del transporte rural y la DUM', '20/03', sala9);
+    addSpeaker('Daniela Flores', 'Directora General de Latnovva E-Mobility', 'Electromovilidad en Yucatán', '20/03', sala9);
+    addSpeaker('Asunción Otero Mantecas', 'Director of Production Planning & Control de Xouba Ingeniería - Datafor Safer Roads', 'Datos en Movimiento. El pulso digital de cada trayecto', '20/03', sala9);
+    addSpeaker('Leire Balzategui Urrutia', 'Responsable de Innovación en la Fundación Mobility Lab Vitoria-Gasteiz', 'Tecnología e Innovación para una Movilidad Sostenible', '20/03', sala9);
+    addSpeaker('Paola Tapia Salas', 'Directora del Directorio de Transporte Público Metropolitano', 'La Consolidación de la Electromovilidad en Santiago de Chile', '20/03', sala9);
+
+    // ========== SALA 10 (20/03) ==========
+    const sala10 = 'SALA 10: Coche, Estacionamiento y Buenas Prácticas';
+    addSpeaker('Elena de la Peña González', 'Subdirectora General Técnica. AEC', 'Actuaciones en Carreteras: parte de la solución', '20/03', sala10);
+    addSpeaker('Mar Cogollos Paja', 'Directora de AESLEME', 'Riesgos y consecuencias de la nueva movilidad urbana', '20/03', sala10);
+    addSpeaker('Paola Carvajal', 'Ingeniera Civil. Miembro fundador de MOVIDANA', 'La juventud y la Seguridad Vial: un nuevo camino para transformar ciudades', '20/03', sala10);
+    addSpeaker('Raquel Genicio Ponce', 'Smart Mobility Manager. TEKIA Ingenieros', 'Implantación de la ZBE de Oviedo: Retos y oportunidades', '20/03', sala10);
+    addSpeaker('Gregorio Serrano', 'Senior Advisor en EY Spain', 'Historia de la Movilidad Urbana Segura', '20/03', sala10);
+    addSpeaker('Roxy Tacq', 'Consultora Independiente en Movilidad y Seguridad Vial', 'Hacia ciudades sin víctimas de tráfico: planificación proactiva desde los Países Bajos', '20/03', sala10);
+    addSpeaker('Pablo García-Trespalacios', 'Presidente de MOVEA', 'Entrevista a Pablo García-Trespalacios', '20/03', sala10);
+    addSpeaker('Inés Alveano Aguerrebere', 'Doctora investigadora en Urban Cycling Institute', 'Estacionamientos: el elefante en la movilidad sustentable', '20/03', sala10);
+    addSpeaker('Ana Álvarez Cruz', 'Senior Strategy Consultant en KPMG', 'El futuro del transporte de mercancías por carretera ante la descarbonización', '20/03', sala10);
+    addSpeaker('Diego Correa', 'Presidente de YPT-Ecuador y UrbaMhub', 'Centro Histórico Bajo en Emisiones en Cuenca', '20/03', sala10);
+    addSpeaker('Benito Salcedo Muñoz', 'Especialista en Seguridad Vial de la Guardia Civil', 'La movilidad periurbana', '20/03', sala10);
+    addSpeaker('José Carlos Cipollone', 'Co-fundador y CEO de Analítica Freight', 'ZBE-Gijón. De ZBE fake a ZBE real gracias al uso de modelización', '20/03', sala10);
+    addSpeaker('María Eugenia Afonso Castrillo', 'Gerente de Electromovilidad. TEKIA Ingenieros', 'Retos y criterios de diseño para adecuar una cochera de autobuses cuando la flota se electrifica', '20/03', sala10);
+
+    // --------------------------------------------------------------
+    // LÓGICA DE FILTRADO Y RENDERIZADO
+    // --------------------------------------------------------------
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('searchName');
+    const filterDay = document.getElementById('filterDay');
+    const filterRoom = document.getElementById('filterRoom');
+    const resetBtn = document.getElementById('resetFilters');
+    const resultCount = document.getElementById('resultCount');
+    const noResults = document.getElementById('noResults');
+
+    function renderTable() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const dayFilter = filterDay.value;
+        const roomFilter = filterRoom.value;
+
+        const filtered = speakers.filter(speaker => {
+            // Filtro por nombre (búsqueda en nombre y afiliación)
+            const fullText = (speaker.name + ' ' + speaker.affiliation).toLowerCase();
+            const matchesName = searchTerm === '' || fullText.includes(searchTerm);
+
+            // Filtro por día
+            const matchesDay = dayFilter === 'all' || speaker.day === dayFilter;
+
+            // Filtro por sala (usamos el inicio del string para agrupar)
+            let roomMatch = false;
+            if (roomFilter === 'all') {
+                roomMatch = true;
+            } else if (roomFilter === 'Directo') {
+                roomMatch = speaker.room.includes('Directo');
+            } else {
+                // Las salas empiezan con "SALA X:" así que comparamos con el código
+                roomMatch = speaker.room.startsWith(roomFilter);
+            }
+
+            return matchesName && matchesDay && roomMatch;
+        });
+
+        // Actualizar contador
+        resultCount.textContent = filtered.length;
+
+        if (filtered.length === 0) {
+            tableBody.innerHTML = '';
+            noResults.classList.remove('d-none');
+        } else {
+            noResults.classList.add('d-none');
+            let html = '';
+            filtered.forEach(s => {
+                html += `<tr>
+                    <td>
+                        <strong>${s.name}</strong><br>
+                        <small class="text-muted">${s.affiliation}</small>
+                    </td>
+                    <td>${s.title}</td>
+                    <td><span class="badge-day">${s.day}</span></td>
+                    <td><span class="badge-room">${s.room}</span></td>
+                    <td>
+                        ${s.time === '18:00' ? '<span class="badge-time"><i class="far fa-clock me-1"></i>18:00</span>' : '<span class="text-muted">Todo el día</span>'}
+                    </td>
+                </tr>`;
+            });
+            tableBody.innerHTML = html;
+        }
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', renderTable);
+    filterDay.addEventListener('change', renderTable);
+    filterRoom.addEventListener('change', renderTable);
+    resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        filterDay.value = 'all';
+        filterRoom.value = 'all';
+        renderTable();
+    });
+
+    // Render inicial
+    renderTable();
+</script>
+
+<!-- Nota: Verifica siempre la información en la web oficial del congreso -->
+</body>
+</html>
